@@ -60,16 +60,32 @@ for (i in 1:2) {
     colnames(data)<-gsub(".stats","",basename(filelist[[i]]))
     colnames(unmapped)<-gsub(".stats","",basename(filelist[[i]]))
 
-    data<-data[rownames(data)!="*",]
-    unmapped<-unmapped[rownames(unmapped)=="*",]
+    a=data[rownames(data)!="*",]
+    a=as.matrix(a)
+    rownames(a)=rownames(data)[rownames(data)!="*"]
+    colnames(a)=colnames(data)
+    data=a
+    #data<-data[rownames(data)!="*",]
+    #unmapped<-unmapped[rownames(unmapped)=="*",]
+    b=unmapped[rownames(unmapped)!="*",]
+    b=as.matrix(b)
+    rownames(b)=rownames(unmapped)[rownames(unmapped)!="*"]
+    colnames(b)=colnames(unmapped)
+    unmapped=b
 
     # Write the summary table of unmapped reads
     write.table(unmapped,file=paste(header,"_unmapped_read_counts.txt",sep=""),sep='\t',quote=FALSE)
 
     # Remove genes with 0 reads in all samples
+    #data<-data[!row_sub,]
     row_sub = apply(data, 1, function(row) all(row ==0 ))
-    data<-data[!row_sub,]
-
+    a<-data[!row_sub,]
+    a=as.matrix(a)
+    colnames(a)=colnames(data)
+    data=a
+        
+                    
+                    
     # Normalization
     dataDGE<-DGEList(counts=data,genes=rownames(data))
     o <- order(rowSums(dataDGE$counts), decreasing=TRUE)
